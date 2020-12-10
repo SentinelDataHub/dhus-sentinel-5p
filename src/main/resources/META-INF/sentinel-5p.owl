@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!--
   Data HUb Service (DHuS) - For Space data distribution.
-  Copyright (C) 2017 European Space Agency (ESA)
-  Copyright (C) 2017 GAEL Systems
-  Copyright (C) 2017 Serco Spa
+  Copyright (C) 2019 European Space Agency (ESA)
+  Copyright (C) 2019 GAEL Systems
+  Copyright (C) 2019 Serco Spa
 
   This file is part of DHuS software sources.
 
@@ -56,10 +56,12 @@
                        category="summary">
          </metadataType>
 
-         <metadataType id="generationTime"
-                       name="Generation time"
-                       contentType="text/plain"
+         <metadataType id="generationDate"
+                       name="Generation date"
+                       contentType="text/date+iso8601"
                        category="product">
+            <solrField name="generationdate"
+                       type="tdate"/>
          </metadataType>
 
          <metadataType id="format"
@@ -205,16 +207,13 @@
          <!-- MM This is added for provisoire
          This should be renamed FOR ALL ADDONS -->
          <!-- SATELLITE -->
-         <metadata
-            category="summary"
-            name="Satellite"
-            type="text/plain">
+         <metadata category="summary" name="Satellite" type="text/plain">
             Sentinel-5 P
          </metadata>,
 
-         <!-- GENERATION TIME -->
-         <metadata name="Generation time"
-                   category="product" type="text/plain">
+         <!-- GENERATION DATE -->
+         <metadata queryable="generationdate" name="Generation date"
+                   category="product" type="text/date+iso8601">
          {
             let $Var_creation_date := fn:data($root/attributes/*[name(.) = "creation_date"])
             return
@@ -356,10 +355,12 @@
                        category="summary">
          </metadataType>
 
-         <metadataType id="generationTime"
-                       name="Generation time"
-                       contentType="text/plain"
+         <metadataType id="generationDate"
+                       name="Generation date"
+                       contentType="text/date+iso8601"
                        category="product">
+            <solrField name="generationdate"
+                       type="tdate"/>
          </metadataType>
 
          <metadataType id="format"
@@ -601,10 +602,10 @@
          let $VAR_product_type := fn:substring($name, 10, 10)
 
          let $VAR_posListTMP :=
-                  fn:data($root/groups/METADATA/groups/EOP_METADATA/groups/
-                          om:featureOfInterest/groups/eop:multiExtentOf/groups/
-                          gml:surfaceMembers/groups/gml:exterior/attributes/
-                          *[name(.) = "gml:posList"])
+            fn:data($root/groups/METADATA/groups/EOP_METADATA/groups/
+                    om:featureOfInterest/groups/eop:multiExtentOf/groups/
+                    gml:surfaceMembers/groups/gml:exterior/attributes/
+                    *[name(.) = "gml:posList"])
 
          let $res :=
          (
@@ -640,26 +641,26 @@
                  fn:data($root/attributes/*[name(.) = "time_coverage_start"])) }
          </metadata>,
 
-         <!-- GENERATION TIME -->
+         <!-- GENERATION DATE -->
          <!-- Could be:
          { local:computedateTime(
               fn:data($root/attributes/*[name(.) = "date_created"])) }
          But extracted from product name (some products seem to miss the above
          field, and extraction is faster). -->
-         <metadata name="Generation time"
-                   category="product" type="text/plain">
+         <metadata queryable="generationdate" name="Generation date"
+                   category="product" type="text/date+iso8601">
          {
             local:computedateTime(
-            concat(fn:substring($name, 69, 4),
-                   "-",
-                   fn:substring($name, 73, 2),
-                   "-",
-                   fn:substring($name, 75, 5),
-                   ":",
-                   fn:substring($name, 80, 2),
-                   ":",
-                   fn:substring($name, 82, 2),
-                   "Z"))
+               concat(fn:substring($name, 69, 4),
+                      "-",
+                      fn:substring($name, 73, 2),
+                      "-",
+                      fn:substring($name, 75, 5),
+                      ":",
+                      fn:substring($name, 80, 2),
+                      ":",
+                      fn:substring($name, 82, 2),
+                      "Z"))
          }
          </metadata>,
 
@@ -728,28 +729,18 @@
          </metadata>,
 
          <!-- PLATFORM NAME -->
-         <!-- Could be:
-         {
-            if ($VAR_platform = "S5P")
-            then "Sentinel-5 Precursor"
-            else "UNKNOWN"
-         }
-         But constant -->
          <metadata queryable="platformname" name="Platform name"
                    category="platform" type="text/plain">
             Sentinel-5 Precursor
          </metadata>,
 
          <!-- PLATFORM SHORT NAME -->
-         <!-- Could be:
-         { $VAR_platform }
-         But constant -->
          <metadata queryable="platformshortname" name="Platform short name"
                    category="platform" type="text/plain">
             S5P
          </metadata>,
 
-         <!-- PLATFORM NUMBER 5P -->
+         <!-- PLATFORM NUMBER -->
          <metadata name="Platform number"
                    category="platform" type="text/plain">
             5P
@@ -849,23 +840,12 @@
          </metadata>,
 
          <!-- INSTRUMENT NAME -->
-         <!-- Could be:
-         {
-            if ($VAR_sensor = "TROPOMI")
-            then "TROPOspheric Monitoring Instrument"
-            else "UNKNOWN"
-         }
-         But constant -->
          <metadata queryable="instrumentname" name="Instrument name"
                    category="instrument" type="text/plain">
             TROPOspheric Monitoring Instrument
          </metadata>,
 
          <!-- INSTRUMENT SHORT NAME -->
-         <!-- Could be:
-         { $VAR_sensor }
-         But extracted from product name (some products seem to miss the above
-         field, and extraction is faster).  -->
          <metadata queryable="instrumentshortname" name="Instrument short name"
                    category="instrument" type="text/plain">
             TROPOMI
@@ -1028,17 +1008,19 @@
                    category="product" type="text/integer">
          { xs:int(fn:substring($name, 53, 5)) }
          </metadata>
-         )
 
          <!-- RELATIVE ORBIT -->
          <!-- No value in product -->
 
          <!-- ORBIT DIRECTION -->
          <!-- No value in product -->
+         )
 
-	    let $GMLFootprint := if (empty($VAR_posListTMP))
-	    then ""
-	    else (
+         let $GMLFootprint :=
+            if (empty($VAR_posListTMP))
+            then ""
+            else
+         (
          <!-- GML FOOTPRINT -->
          <metadata queryable="gmlfootprint" name="Footprint"
                    category="product" type="application/gml+xml">
@@ -1079,12 +1061,13 @@
                </gml:outerBoundaryIs>
             </gml:Polygon>
          </metadata>
-      )
+         )
 
-	  let $JTSFootprint := if (empty($VAR_posListTMP))
-	    then ""
-	    else (
-
+         let $JTSFootprint :=
+            if (empty($VAR_posListTMP))
+            then ""
+            else
+         (
          <!-- JTS FOOTPRINT -->
          <metadata
             queryable="footprint"
@@ -1167,11 +1150,12 @@
                return $footprint
             }
          </metadata>
-      )
+         )
 
-      return if (empty($VAR_posListTMP))
-	    then $res
-	    else ($res, $GMLFootprint, $JTSFootprint)
+         return
+            if (empty($VAR_posListTMP))
+            then $res
+            else ($res, $GMLFootprint, $JTSFootprint)
       ]]>
       </dhus:metadataExtractor>
 
@@ -1197,10 +1181,12 @@
                        category="summary">
          </metadataType>
 
-         <metadataType id="generationTime"
-                       name="Generation time"
-                       contentType="text/plain"
+         <metadataType id="generationDate"
+                       name="Generation date"
+                       contentType="text/date+iso8601"
                        category="product">
+            <solrField name="generationdate"
+                       type="tdate"/>
          </metadataType>
 
          <metadataType id="format"
@@ -1370,9 +1356,9 @@
             SSMIS
          </metadata>,
 
-         <!-- GENERATION TIME -->
-         <metadata name="Generation time"
-                   category="product" type="text/plain">
+         <!-- GENERATION DATE -->
+         <metadata queryable="generationdate" name="Generation date"
+                   category="product" type="text/date+iso8601">
          {
             $VAR_time
          }

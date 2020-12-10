@@ -14,7 +14,7 @@
    <groupId>eu.serco.xmf.drb</groupId>
    <artifactId>dhus-addon-sentinel-5p</artifactId>
    <packaging>jar</packaging>
-   <version>1.0.9-osf</version>
+   <version>1.0.12-osf</version>
 
    <name>DHuS - Sentinel 5P addon</name>
 
@@ -82,7 +82,7 @@
 <!-- repository https://copernicus.serco.eu/repository/nexus/content/repositories/releases
      used to proxy gael's resources requires credentials
      Using alternative source repository. -->
-         <url>https://repository.gael.fr/nexus/content/groups/public</url>
+         <url>https://repository.gael-systems.com/repository/public</url>
       </repository>
    </repositories>
 
