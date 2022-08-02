@@ -187,11 +187,13 @@
 
          let $root := ./root
 
+         <!-- MM TO BE REMOVED WITH NEXT RELESE
          let $VAR_validity_start := local:computedateTime(
             data($root/attributes/*[name(.) = "validity_start"]))
 
          let $VAR_validity_stop := local:computedateTime(
             data($root/attributes/*[name(.) = "validity_stop"]))
+         -->
 
          let $VAR_product_type := fn:substring($name, 10, 10)
 
@@ -275,7 +277,12 @@
             return
                if ($Var_validity_start)
                then local:computedateTime($Var_validity_start)
-               else local:computedateTime(fn:substring($name, 21, 15))
+               else
+                  let $Var_time_coverage_start := fn:data($root/attributes/*[name(.) = "time_coverage_start"])
+                  return
+                     if ($Var_time_coverage_start)
+                     then local:computedateTime($Var_time_coverage_start)
+                     else local:computedateTime(fn:substring($name, 21, 15))
          }
          </metadata>,
 
@@ -287,7 +294,12 @@
             return
                if ($Var_validity_stop)
                then local:computedateTime($Var_validity_stop)
-               else local:computedateTime(fn:substring($name, 37, 15))
+               else
+                  let $Var_time_coverage_end := fn:data($root/attributes/*[name(.) = "time_coverage_end"])
+                  return
+                     if ($Var_time_coverage_end)
+                     then local:computedateTime($Var_time_coverage_end)
+                  else local:computedateTime(fn:substring($name, 37, 15))
          }
          </metadata>,
 
